@@ -1,0 +1,8 @@
+# Config file for Plex Autorefresh.
+# =================================
+# Plex address here. Please include the ip and port in the address. Don't add "/" at the end of the address!!!
+PLEXADDR: http://127.0.0.1:32400
+# Plex Token. Can be acquired through inspecting any movie file in your library and viewing the XML file. your Token should be at the end of that address.
+TOKEN: xxXXXxxXXxxXXxx
+# The port for the webhook, default is 6969, wink wink.
+PORT: 6969
