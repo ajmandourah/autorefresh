@@ -1,4 +1,7 @@
 # autorefresh 🎥
+
+[![Visits Badge](https://badges.pufler.dev/visits/ajmandourah/autorefresh)](https://badges.pufler.dev)  [![GitHub forks](https://img.shields.io/github/forks/ajmandourah/autorefresh)](https://github.com/ajmandourah/autorefresh/network)  
+
 Plex autorefresh is python scripted solution to a problem that has been around for many years without any apparent solution.
 
 Autorefresh issues a force metadata update of a specific Movie/show which force detecting any changes in subtitles, an issue which apparently happens with rclone mounted libraries and subtitle solutions like bazarr.
