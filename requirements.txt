@@ -1,0 +1,5 @@
+bottle
+gunicorn
+PyYAML
+requests
+urllib3
