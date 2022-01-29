@@ -35,6 +35,36 @@ WantedBy=multi-user.target
 
 ```
 
+### Docker:
+For the docker image, ENV variable make it eaiser to configure the script as an alternative to the config file. If ENV variable was not define the config file will be generated in the docker volume. you can use either but the env variable way is preferred.
+Map the autorefresh volume to your host, this will have the logs as well as the generated config file ( if ENV variable were not specefied )
+
+using docker, edit the env variables to your server's setting 
+```
+sudo docker run -v /PATH/TO/CONFIG:/data/autorefresh -e PLEXADDR=http://127.0.0.1:32400 -e PORT=4343 -e TOKEN=12345 -e PUID=1000 -e PGID=1000 ajmandourah/autorefresh:latest
+```
+
+using docker-compose
+```
+version: "2.1"
+services:
+  autorefresh:
+    image: ajmandourah/autorefresh
+    container_name: autorefresh
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - PLEXADDR=http:\\127.0.0.1:34200 #Required change to your server address.
+      - TOKEN=xxxxxxxxxxxx #Required, Plex Token
+      - PORT=6969 #Internal PORT. do not change.
+    volumes:
+      - /PATH/TO/CONFIG:/data/autorefresh
+    ports:
+      - 6969:6969
+    restart: unless-stopped
+```
+
 ## How to use autorefresh
 Autorefresh exposes a webhook point at `/refresh` on the port that you defined, default is port `6969`. Sending post requests with attached `Content-Type: application/json` header and JSON formated data with a `dir` key with the directory of the content you want will send a refresh metadata request to your plex server.
 
@@ -48,6 +78,8 @@ The curl command can be used as post processing script in bazarr like this
 ```
 curl -X POST http://127.0.0.1:6969/refresh -d '{"dir":"{{directory}}"}' -H 'Content-Type: application/json'
 ```
+
+make sure to change the default 127.0.0.1 to your host ip/domain
 
 ## How it works
 Plex API allow you to issue a scan library command as per [Plex Media Server URL commands](https://support.plex.tv/articles/201638786-plex-media-server-url-commands/). This has been used in most of the autoscan script including plex_autoscan and autoscan. There is no mention of the ability to issue a directed metadata refresh of a specefic content here rather a full metadata refresh of the whole library.
