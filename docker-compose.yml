@@ -1,0 +1,17 @@
+version: "2.1"
+services:
+  autorefresh:
+    image: ajmandourah/autorefresh
+    container_name: autorefresh
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - PLEXADDR=http:\\127.0.0.1:34200 #Required
+      - TOKEN=xxxxxxxxxxxx #Required, Plex Token
+      - PORT=6969 #Internal PORT. do not change.
+    volumes:
+      - /home/ladis/config:/data/autorefresh
+    ports:
+      - 6969:6969
+    restart: unless-stopped
