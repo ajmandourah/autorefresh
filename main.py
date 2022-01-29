@@ -3,18 +3,27 @@ import json
 import bottle
 import yaml
 import logging
+import os , sys
 
-logging.basicConfig(level= logging.INFO,format= '[%(asctime)s] [%(process)d] [%(levelname)s]  %(message)s', filename='autorefresh/autorefresh.log', filemode='a')
+def checkConfig():
+    if os.path.isfile('autorefresh/config.yaml'):
+        with open('autorefresh/config.yaml', 'r') as f:
+            cfg = yaml.safe_load(f)
+
+        PLEXADDR = cfg['PLEXADDR']
+        TOKEN = cfg['TOKEN']
+        PORT = cfg['PORT']
+        logging.info('Config file detected!')
+        return True
+    else:
+        with open('autorefresh/config.yaml', 'w') as f:
+            f.write('PLEXADDR: http//:127.0.0.1:32400\n')
+            f.write('TOKEN: 0000 #put your Token here\n')
+            f.write('PORT: 6969')
+        logging.warning('Config file is not detected, Creating one, please add your Plex token and edit it to your setting. ')
+        return False
 
 
-with open('autorefresh/config.yaml', 'r') as f:
-    cfg = yaml.safe_load(f)
-
-PLEXADDR = cfg['PLEXADDR']
-TOKEN = cfg['TOKEN']
-PORT = cfg['PORT']
-
-logging.info('Config file imported...Starting the service')
 
 app = application = bottle.default_app()
 
@@ -51,6 +60,7 @@ def contentMetadataID():
 
 @bottle.post("/refresh")
 def refresh():
+    checkConfig()
     try:
     # parse input data
         try:
@@ -95,9 +105,38 @@ def refresh():
         except:
             logging.error('There was some problem sending the command to Plex!! Aborting!')
     except:
+        logging.warning('Failed!!! either the content was not found or your plex token / plex address was not correct!')
         return "Could not find the dir, make sure its correct"
-    logging.info('SUCCESS!!')
+    logging.info('SUCCESS!! Refresh metadata request sent!')
     return "done"
 
 if __name__ == '__main__':
-    bottle.run(server= 'gunicorn',host = '0.0.0.0', port = PORT)
+    output_file_handler = logging.FileHandler("autorefresh/autorefresh.log")
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    logging.basicConfig(level= logging.INFO,format= '[%(asctime)s] [%(process)d] [%(levelname)s]  %(message)s', handlers=[output_file_handler,stdout_handler])
+    # checking ENV
+    PLEXADDR = os.getenv('PLEXADDR')
+    TOKEN = os.getenv('TOKEN')
+    PORT = os.getenv('PORT')
+
+    if not all([PLEXADDR,TOKEN,PORT]):
+        logging.info('Not all env variable detected...checking for config file!!')
+        status = checkConfig()
+        if status == True:
+            with open('autorefresh/config.yaml', 'r') as f:
+                cfg = yaml.safe_load(f)
+
+            PLEXADDR = cfg['PLEXADDR']
+            TOKEN = cfg['TOKEN']
+            PORT = cfg['PORT']
+            bottle.run(server= 'gunicorn',host = '0.0.0.0', port = PORT)
+        else:
+            logging.debug('exiting!')
+    else:
+        bottle.run(server= 'gunicorn',host = '0.0.0.0', port = PORT)
+
+
+        
+
+
+
