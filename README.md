@@ -91,5 +91,5 @@ The biggest limitation is TV series. the metadata id is for the whole show. this
 ## Todo
 - do a more thourough API hunt to see if the TV show limitations can be fixed.
 - Create a page for manual post requests.
-- create a docker image.
+- ~~create a docker image.~~
 - you tell me...
