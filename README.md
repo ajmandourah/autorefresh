@@ -55,7 +55,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
-      - PLEXADDR=http:\\127.0.0.1:34200 #Required change to your server address.
+      - PLEXADDR=http://127.0.0.1:32400 #Required change to your server address.
       - TOKEN=xxxxxxxxxxxx #Required, Plex Token
       - PORT=6969 #Internal PORT. do not change.
     volumes:
@@ -76,7 +76,7 @@ curl -X POST http://127.0.0.1:6969/refresh -d '{"dir":"/movies/Paul Blart Mall C
 The curl command can be used as post processing script in bazarr like this
 
 ```
-curl -X POST http://127.0.0.1:6969/refresh -d '{"dir":"{{directory}}"}' -H 'Content-Type: application/json'
+curl -X POST http://127.0.0.1:6969/refresh -d '{"dir":"{{directory}}"}' -H 'Content-Type: application/json' 2>&1 
 ```
 
 make sure to change the default 127.0.0.1 to your host ip/domain
