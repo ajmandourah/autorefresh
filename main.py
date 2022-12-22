@@ -4,6 +4,7 @@ import bottle
 import yaml
 import logging
 import os , sys
+import urllib3
 
 def checkConfig():
     if os.path.isfile('autorefresh/config.yaml'):
@@ -30,7 +31,10 @@ app = application = bottle.default_app()
 
 #fetching all libraries IDs
 def libraryID():
-    libraries = requests.get(PLEXADDR + "/library/sections?X-Plex-Token=" + TOKEN, headers={"Accept":"application/json"})
+    session = requests.Session()
+    session.verify = False
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    libraries = session.get(PLEXADDR + "/library/sections?X-Plex-Token=" + TOKEN, headers={"Accept":"application/json"})
     liblist = json.loads(libraries.content)["MediaContainer"]["Directory"]
     libcount = len(liblist)
     libidlist = []
@@ -41,10 +45,13 @@ def libraryID():
 
 #fetching shows and metadata ids
 def contentMetadataID():
+    session = requests.Session()
+    session.verify = False
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     shows = {}
     logging.info('going through your library\'s content. Scraping metadata IDs')
     for i in libraryID():
-        x = requests.get(PLEXADDR + "/library/sections/" + str(i) + "/all?X-Plex-Token=" + TOKEN, headers={"Accept":"application/json"})
+        x = session.get(PLEXADDR + "/library/sections/" + str(i) + "/all?X-Plex-Token=" + TOKEN, headers={"Accept":"application/json"})
         y = json.loads(x.content)["MediaContainer"]["Metadata"]
         for q in y:
             try:
@@ -59,7 +66,11 @@ def contentMetadataID():
 
 
 @bottle.post("/refresh")
+
 def refresh():
+    session = requests.Session()
+    session.verify = False
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     checkConfig()
     try:
     # parse input data
@@ -101,7 +112,7 @@ def refresh():
         # Send the request for the metadata refresh
         try:
             logging.info('Sending refresh command to Plex Media Server')
-            r = requests.put(PLEXADDR +"/library/metadata/" + str(metaid) + "/refresh?X-Plex-Token=" + TOKEN)
+            r = session.put(PLEXADDR +"/library/metadata/" + str(metaid) + "/refresh?X-Plex-Token=" + TOKEN)
         except:
             logging.error('There was some problem sending the command to Plex!! Aborting!')
     except:
